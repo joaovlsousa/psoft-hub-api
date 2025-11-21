@@ -8,7 +8,7 @@ export class InMemoryProjectsRepository implements ProjectsRespository {
   public projects: Project[] = []
 
   async create(project: Project): Promise<void> {
-    this.projects.push(project)
+    this.projects = [project, ...this.projects]
   }
 
   async save(project: Project): Promise<void> {

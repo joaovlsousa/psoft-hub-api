@@ -3,7 +3,7 @@ import type {
   UpdateImageParams,
 } from '@domain/application/repositories/projects-repository.ts'
 import type { Project } from '@domain/enterprise/entities/project.ts'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { dbClient } from '../client.ts'
 import { DrizzleProjectsMapper } from '../mappers/drizzle-projects-mapper.ts'
@@ -34,6 +34,7 @@ export class DrizzleProjectsRepository implements ProjectsRespository {
       .select()
       .from(projectsTable)
       .where(eq(projectsTable.userId, userId))
+      .orderBy(desc(projectsTable.createdAt))
 
     return projects.map(DrizzleProjectsMapper.toDomain)
   }
