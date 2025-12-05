@@ -1,5 +1,6 @@
 # Variables
 @baseUrl = http://localhost:3333
+@origin = http://localhost:5173
 @token = {{auth.response.body.$.token}}
 @projectId = {{createProject.response.body.$.projectId}}
 
@@ -8,9 +9,10 @@
 # @name auth
 POST {{baseUrl}}/sessions/github
 Content-Type: application/json
+Origin: {{origin}}
 
 {
-  "code": "e60b8fd1e924a0d1e067"
+  "code": "fd126218c6cd5c57aead"
 }
 
 ###
@@ -18,6 +20,7 @@ Content-Type: application/json
 # @name getProfile
 GET {{baseUrl}}/profile
 Authorization: Bearer {{token}}
+Origin: {{origin}}
 
 ###
 
@@ -25,6 +28,7 @@ Authorization: Bearer {{token}}
 POST {{baseUrl}}/projects
 Content-Type: application/json
 Authorization: Bearer {{token}}
+Origin: {{origin}}
 
 {
   "name": "Project 1",
@@ -38,12 +42,14 @@ Authorization: Bearer {{token}}
 # @name findProjectsByUserId
 GET {{baseUrl}}/projects
 Authorization: Bearer {{token}}
+Origin: {{origin}}
 
 ###
 
 # @name findProjectById
 GET {{baseUrl}}/projects/{{projectId}}
 Authorization: Bearer {{token}}
+Origin: {{origin}}
 
 ###
 
@@ -51,6 +57,7 @@ Authorization: Bearer {{token}}
 PUT {{baseUrl}}/projects/{{projectId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
+Origin: {{origin}}
 
 {
   "name": "Project updated",
@@ -64,3 +71,4 @@ Authorization: Bearer {{token}}
 # @name deleteProject
 DELETE {{baseUrl}}/projects/{{projectId}}
 Authorization: Bearer {{token}}
+Origin: {{origin}}

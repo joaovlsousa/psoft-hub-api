@@ -6,6 +6,7 @@ import { UploadthingStorageService } from '@infra/services/uploadthig-storage-se
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { authMiddleware } from '../middlewares/auth-middleware.ts'
+import { clientHostMiddleware } from '../middlewares/client-host-middleware.ts'
 
 export const uploadProjectImageRoute: FastifyPluginAsyncZod = async (app) => {
   app.patch(
@@ -39,7 +40,7 @@ export const uploadProjectImageRoute: FastifyPluginAsyncZod = async (app) => {
           }),
         },
       },
-      preHandler: [authMiddleware],
+      preHandler: [authMiddleware, clientHostMiddleware],
     },
     async (request, reply) => {
       const { projectId } = request.params
