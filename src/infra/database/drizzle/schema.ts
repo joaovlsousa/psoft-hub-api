@@ -1,4 +1,11 @@
-import { pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core'
+import {
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core'
 
 export const projectType = pgEnum('project_type', [
   'frontend',
@@ -42,3 +49,16 @@ export const techsTable = pgTable('techs', {
   createdAt: timestamp().notNull(),
   updatedAt: timestamp(),
 })
+
+export const projectTechTable = pgTable(
+  'project_tech',
+  {
+    projectId: text().notNull(),
+    techId: text().notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.projectId, table.techId],
+    }),
+  ]
+)

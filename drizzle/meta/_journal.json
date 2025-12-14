@@ -15,6 +15,13 @@
       "when": 1764702192375,
       "tag": "0001_uneven_selene",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765636288506,
+      "tag": "0002_aromatic_nebula",
+      "breakpoints": true
     }
   ]
 }

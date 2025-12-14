@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '@core/entities/unique-entity-id.ts'
-import { Tech } from '@domain/enterprise/entities/tech.ts'
+import { Tech } from '@domain/entities/tech.ts'
 import type { techsTable } from '../schema.ts'
 
 type RawTech = typeof techsTable.$inferSelect

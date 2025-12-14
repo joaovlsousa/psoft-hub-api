@@ -4,12 +4,14 @@ import type { Optional } from '@core/types/optional.ts'
 import type { ProjectType } from '@core/types/project-type.ts'
 import type { Description } from './description.ts'
 import type { Name } from './name.ts'
+import type { Tech } from './tech.ts'
 
 export interface ProjectProps {
   name: Name
   description: Description
   type: ProjectType
   userId: UniqueEntityID
+  techs: Tech[]
   imageUrl?: string | null
   imageId?: string | null
   githubUrl: string
@@ -50,6 +52,10 @@ export class Project extends Entity<ProjectProps> {
     return this.props.userId
   }
 
+  public get techs(): Tech[] {
+    return this.props.techs
+  }
+
   public get imageUrl(): string | undefined | null {
     return this.props.imageUrl
   }
@@ -74,11 +80,39 @@ export class Project extends Entity<ProjectProps> {
     return this.props.updatedAt
   }
 
-  public set imageId(imageId: string) {
+  public set name(name: Name) {
+    this.props.name = name
+  }
+
+  public set description(description: Description) {
+    this.props.description = description
+  }
+
+  public set type(type: ProjectType) {
+    this.props.type = type
+  }
+
+  public set techs(techs: Tech[]) {
+    this.props.techs = techs
+  }
+
+  public set githubUrl(githubUrl: string) {
+    this.props.githubUrl = githubUrl
+  }
+
+  public set deployUrl(deployUrl: string | undefined | null) {
+    this.props.deployUrl = deployUrl
+  }
+
+  public set imageId(imageId: string | undefined | null) {
     this.props.imageId = imageId
   }
 
-  public set imageUrl(imageUrl: string) {
+  public set imageUrl(imageUrl: string | undefined | null) {
     this.props.imageUrl = imageUrl
+  }
+
+  public set updatedAt(date: Date) {
+    this.props.updatedAt = date
   }
 }

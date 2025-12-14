@@ -1,6 +1,6 @@
 import { validateImage } from '@core/functions/validate-image.ts'
 import type { ImageFile } from '@core/types/image.ts'
-import { Tech } from '@domain/enterprise/entities/tech.ts'
+import { Tech } from '@domain/entities/tech.ts'
 import type { TechsRespository } from '../repositories/techs-repository.ts'
 import type { StorageService } from '../services/storage-service.ts'
 

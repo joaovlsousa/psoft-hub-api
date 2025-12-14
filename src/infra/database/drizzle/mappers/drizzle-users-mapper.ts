@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '@core/entities/unique-entity-id.ts'
-import { User } from '@domain/enterprise/entities/user.ts'
+import { User } from '@domain/entities/user.ts'
 import type { usersTable } from '../schema.ts'
 
 type RawUser = typeof usersTable.$inferSelect

@@ -12,7 +12,7 @@ Content-Type: application/json
 Origin: {{origin}}
 
 {
-  "code": "fd126218c6cd5c57aead"
+  "code": "32bc1548cc2872990c4a"
 }
 
 ###
@@ -31,9 +31,15 @@ Authorization: Bearer {{token}}
 Origin: {{origin}}
 
 {
-  "name": "Project 1",
+  "name": "Project API",
   "description": "project description",
-  "type": "fullstack",
+  "type": "backend",
+  "techsIds": [
+    "csaqplggm5cnk5gvk1mee53l",
+    "dg0mtkuujsnnsmiyrj31e4gn",
+    "y7h76rpe9bpu0nyoge75r8uo",
+    "r4dril0oqwn98r4d8nz8d0wn"
+  ],
   "githubUrl": "https://github.com/sercomp"
 }
 
@@ -60,9 +66,14 @@ Authorization: Bearer {{token}}
 Origin: {{origin}}
 
 {
-  "name": "Project updated",
-  "description": "project description updated",
+  "name": "Project API Updated",
+  "description": "Project description updated",
   "type": "backend",
+   "techsIds": [
+    "csaqplggm5cnk5gvk1mee53l",
+    "dg0mtkuujsnnsmiyrj31e4gn",
+    "y7h76rpe9bpu0nyoge75r8uo"
+  ],
   "githubUrl": "https://github.com/project-updated"
 }
 

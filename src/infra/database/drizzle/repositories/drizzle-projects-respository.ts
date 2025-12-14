@@ -1,13 +1,10 @@
-import type {
-  ProjectsRespository,
-  UpdateImageParams,
-} from '@domain/application/repositories/projects-repository.ts'
-import type { Project } from '@domain/enterprise/entities/project.ts'
-import { desc, eq } from 'drizzle-orm'
+import type { ProjectsRespository } from '@domain/application/repositories/projects-repository.ts'
+import type { Project } from '@domain/entities/project.ts'
+import { desc, eq, sql } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { dbClient } from '../client.ts'
 import { DrizzleProjectsMapper } from '../mappers/drizzle-projects-mapper.ts'
-import { projectsTable } from '../schema.ts'
+import { projectsTable, projectTechTable, techsTable } from '../schema.ts'
 
 export class DrizzleProjectsRepository implements ProjectsRespository {
   private readonly db: NodePgDatabase
@@ -17,55 +14,128 @@ export class DrizzleProjectsRepository implements ProjectsRespository {
   }
 
   async findById(projectId: string): Promise<Project | null> {
-    const [raw] = await this.db
+    const [rawProject] = await this.db
       .select()
       .from(projectsTable)
       .where(eq(projectsTable.id, projectId))
 
-    if (!raw) {
+    if (!rawProject) {
       return null
+    }
+
+    const rawTechs = await this.db
+      .select({
+        id: techsTable.id,
+        name: techsTable.name,
+        imageUrl: techsTable.imageUrl,
+        imageId: techsTable.imageId,
+        createdAt: techsTable.createdAt,
+        updatedAt: techsTable.updatedAt,
+      })
+      .from(projectTechTable)
+      .innerJoin(techsTable, eq(projectTechTable.techId, techsTable.id))
+      .where(eq(projectTechTable.projectId, rawProject.id))
+
+    const raw = {
+      rawProject,
+      rawTechs,
     }
 
     return DrizzleProjectsMapper.toDomain(raw)
   }
 
   async findByUserId(userId: string): Promise<Project[]> {
-    const projects = await this.db
-      .select()
+    const raw = await this.db
+      .select({
+        rawProject: {
+          id: projectsTable.id,
+          name: projectsTable.name,
+          description: projectsTable.description,
+          type: projectsTable.type,
+          userId: projectsTable.userId,
+          githubUrl: projectsTable.githubUrl,
+          deployUrl: projectsTable.deployUrl,
+          imageUrl: projectsTable.imageUrl,
+          imageId: projectsTable.imageId,
+          createdAt: projectsTable.createdAt,
+          updatedAt: projectsTable.updatedAt,
+        },
+        rawTechs: sql<(typeof techsTable.$inferSelect)[]>`
+          coalesce(
+            json_agg(
+              json_build_object(
+                'id', ${techsTable.id},
+                'name', ${techsTable.name},
+                'imageUrl', ${techsTable.imageUrl},
+                'imageId', ${techsTable.imageId},
+                'createdAt', ${techsTable.createdAt},
+                'updatedAt', ${techsTable.updatedAt}
+              )
+            ) filter (where ${techsTable.id} is not null),
+            '[]'
+          )
+        `.as('rawTechs'),
+      })
       .from(projectsTable)
+      .leftJoin(
+        projectTechTable,
+        eq(projectsTable.id, projectTechTable.projectId)
+      )
+      .leftJoin(techsTable, eq(projectTechTable.techId, techsTable.id))
       .where(eq(projectsTable.userId, userId))
+      .groupBy(
+        projectsTable.id,
+        projectsTable.name,
+        projectsTable.description,
+        projectsTable.type,
+        projectsTable.userId,
+        projectsTable.githubUrl,
+        projectsTable.deployUrl,
+        projectsTable.imageUrl,
+        projectsTable.imageId,
+        projectsTable.createdAt,
+        projectsTable.updatedAt
+      )
       .orderBy(desc(projectsTable.createdAt))
 
-    return projects.map(DrizzleProjectsMapper.toDomain)
-  }
-
-  async updateImage({
-    imageId,
-    imageUrl,
-    projectId,
-  }: UpdateImageParams): Promise<void> {
-    await this.db
-      .update(projectsTable)
-      .set({
-        imageId,
-        imageUrl,
-      })
-      .where(eq(projectsTable.id, projectId))
+    return raw.map(DrizzleProjectsMapper.toDomain)
   }
 
   async save(project: Project): Promise<void> {
-    const raw = DrizzleProjectsMapper.toDrizzle(project)
+    const { rawProject, rawTechs } = DrizzleProjectsMapper.toDrizzle(project)
 
-    await this.db
-      .update(projectsTable)
-      .set(raw)
-      .where(eq(projectsTable.id, raw.id))
+    await this.db.transaction(async (tx) => {
+      await tx
+        .update(projectsTable)
+        .set(rawProject)
+        .where(eq(projectsTable.id, rawProject.id))
+
+      await tx
+        .delete(projectTechTable)
+        .where(eq(projectTechTable.projectId, rawProject.id))
+
+      await tx.insert(projectTechTable).values(
+        rawTechs.map((rawTech) => ({
+          projectId: rawProject.id,
+          techId: rawTech.id,
+        }))
+      )
+    })
   }
 
   async create(project: Project): Promise<void> {
-    const raw = DrizzleProjectsMapper.toDrizzle(project)
+    const { rawProject, rawTechs } = DrizzleProjectsMapper.toDrizzle(project)
 
-    await this.db.insert(projectsTable).values(raw)
+    await this.db.transaction(async (tx) => {
+      await tx.insert(projectsTable).values(rawProject)
+
+      await tx.insert(projectTechTable).values(
+        rawTechs.map((rawTech) => ({
+          projectId: rawProject.id,
+          techId: rawTech.id,
+        }))
+      )
+    })
   }
 
   async delete(projectId: string): Promise<void> {

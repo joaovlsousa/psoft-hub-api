@@ -30,6 +30,13 @@ export const findProjectByIdRoute: FastifyPluginAsyncZod = async (app) => {
               imageUrl: z.httpUrl().nullable(),
               githubUrl: z.httpUrl(),
               deployUrl: z.httpUrl().nullable(),
+              techs: z.array(
+                z.object({
+                  id: z.cuid2(),
+                  name: z.string(),
+                  imageUrl: z.httpUrl().nullable(),
+                })
+              ),
               createdAt: z.date(),
               updatedAt: z.date().nullable(),
             }),
@@ -66,6 +73,11 @@ export const findProjectByIdRoute: FastifyPluginAsyncZod = async (app) => {
           imageUrl: project.imageUrl ?? null,
           githubUrl: project.githubUrl,
           deployUrl: project.deployUrl ?? null,
+          techs: project.techs.map((tech) => ({
+            id: tech.id.toString(),
+            name: tech.name,
+            imageUrl: tech.imageUrl,
+          })),
           createdAt: project.createdAt,
           updatedAt: project.updatedAt ?? null,
         },

@@ -1,4 +1,4 @@
-import type { Project } from '@domain/enterprise/entities/project.ts'
+import type { Project } from '@domain/entities/project.ts'
 import type { ProjectsRespository } from '../repositories/projects-repository.ts'
 
 interface FindProjectsByIdUseCaseRequest {

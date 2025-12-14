@@ -1,4 +1,4 @@
-import type { Project } from '@domain/enterprise/entities/project.ts'
+import type { Project } from '@domain/entities/project.ts'
 
 export interface UpdateImageParams {
   projectId: string
@@ -9,7 +9,6 @@ export interface UpdateImageParams {
 export interface ProjectsRespository {
   findByUserId(userId: string): Promise<Project[]>
   findById(projectId: string): Promise<Project | null>
-  updateImage(params: UpdateImageParams): Promise<void>
   save(project: Project): Promise<void>
   create(project: Project): Promise<void>
   delete(projectId: string): Promise<void>

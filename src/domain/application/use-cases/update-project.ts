@@ -1,9 +1,11 @@
-import { UniqueEntityID } from '@core/entities/unique-entity-id.ts'
 import { ForbiddenError } from '@core/errors/forbidden-error.ts'
 import { NotFoundError } from '@core/errors/not-found-error.ts'
 import type { ProjectType } from '@core/types/project-type.ts'
-import { Project } from '@domain/enterprise/entities/project.ts'
+import { Description } from '@domain/entities/description.ts'
+import { Name } from '@domain/entities/name.ts'
+import type { Project } from '@domain/entities/project.ts'
 import type { ProjectsRespository } from '../repositories/projects-repository.ts'
+import type { TechsRespository } from '../repositories/techs-repository.ts'
 
 interface UpdateProjectUseCaseRequest {
   projectId: string
@@ -11,6 +13,7 @@ interface UpdateProjectUseCaseRequest {
   name: string
   description: string
   type: ProjectType
+  techsIds: string[]
   githubUrl: string
   deployUrl?: string
 }
@@ -20,7 +23,10 @@ interface UpdateProjectUseCaseResponse {
 }
 
 export class UpdateProjectUseCase {
-  public constructor(private projectsRepository: ProjectsRespository) {}
+  public constructor(
+    private projectsRepository: ProjectsRespository,
+    private techsRespository: TechsRespository
+  ) {}
 
   async execute({
     projectId,
@@ -28,6 +34,7 @@ export class UpdateProjectUseCase {
     description,
     type,
     userId,
+    techsIds,
     githubUrl,
     deployUrl,
   }: UpdateProjectUseCaseRequest): Promise<UpdateProjectUseCaseResponse> {
@@ -41,26 +48,20 @@ export class UpdateProjectUseCase {
       throw new ForbiddenError('You cannot perform this action')
     }
 
-    const projectUpdated = Project.create(
-      {
-        name,
-        description,
-        type,
-        userId: new UniqueEntityID(userId),
-        githubUrl,
-        deployUrl,
-        imageId: project.imageId,
-        imageUrl: project.imageUrl,
-        createdAt: project.createdAt,
-        updatedAt: project.updatedAt,
-      },
-      project.id
-    )
+    const techs = await this.techsRespository.findManyByIdList(techsIds)
 
-    await this.projectsRepository.save(projectUpdated)
+    project.name = new Name(name)
+    project.description = new Description(description)
+    project.type = type
+    project.techs = techs
+    project.githubUrl = githubUrl
+    project.deployUrl = deployUrl
+    project.updatedAt = new Date()
+
+    await this.projectsRepository.save(project)
 
     return {
-      project: projectUpdated,
+      project,
     }
   }
 }

@@ -1,6 +1,6 @@
 import type { TechsRespository } from '@domain/application/repositories/techs-repository.ts'
-import type { Tech } from '@domain/enterprise/entities/tech.ts'
-import { asc, eq } from 'drizzle-orm'
+import type { Tech } from '@domain/entities/tech.ts'
+import { asc, eq, inArray } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { dbClient } from '../client.ts'
 import { DrizzleTechsMapper } from '../mappers/drizzle-techs-mapper.ts'
@@ -17,6 +17,16 @@ export class DrizzleTechsRepository implements TechsRespository {
     const techs = await this.db
       .select()
       .from(techsTable)
+      .orderBy(asc(techsTable.name))
+
+    return techs.map(DrizzleTechsMapper.toDomain)
+  }
+
+  async findManyByIdList(techsIds: string[]): Promise<Tech[]> {
+    const techs = await this.db
+      .select()
+      .from(techsTable)
+      .where(inArray(techsTable.id, techsIds))
       .orderBy(asc(techsTable.name))
 
     return techs.map(DrizzleTechsMapper.toDomain)

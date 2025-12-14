@@ -40,10 +40,10 @@ export class UploadProjectImageUseCase {
 
     const { imageId, imageUrl } = await this.storageService.upload(image)
 
-    await this.projectsRepository.updateImage({
-      imageId,
-      imageUrl,
-      projectId,
-    })
+    project.imageId = imageId
+    project.imageUrl = imageUrl
+    project.updatedAt = new Date()
+
+    await this.projectsRepository.save(project)
   }
 }

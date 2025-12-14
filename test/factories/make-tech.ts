@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '@core/entities/unique-entity-id.ts'
-import { Tech, type TechProps } from '@domain/enterprise/entities/tech.ts'
+import { Tech, type TechProps } from '@domain/entities/tech.ts'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
 export function makeTech(

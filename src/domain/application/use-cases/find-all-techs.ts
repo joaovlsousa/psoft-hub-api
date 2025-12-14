@@ -1,4 +1,4 @@
-import type { Tech } from '@domain/enterprise/entities/tech.ts'
+import type { Tech } from '@domain/entities/tech.ts'
 import type { TechsRespository } from '../repositories/techs-repository.ts'
 
 interface FindAllTechsUseCaseResponse {

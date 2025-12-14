@@ -1,5 +1,5 @@
 import type { UniqueEntityID } from '@core/entities/unique-entity-id.ts'
-import { User, type UserProps } from '@domain/enterprise/entities/user.ts'
+import { User, type UserProps } from '@domain/entities/user.ts'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
 export function makeUser(

@@ -1,6 +1,7 @@
 import { httpErrorSchema } from '@core/schemas/http-error-schema.ts'
 import { CreateProjectUseCase } from '@domain/application/use-cases/create-project.ts'
 import { DrizzleProjectsRepository } from '@infra/database/drizzle/repositories/drizzle-projects-respository.ts'
+import { DrizzleTechsRepository } from '@infra/database/drizzle/repositories/drizzle-techs-respository.ts'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { authMiddleware } from '../middlewares/auth-middleware.ts'
@@ -21,6 +22,7 @@ export const createProjectRoute: FastifyPluginAsyncZod = async (app) => {
             z.literal('backend'),
             z.literal('fullstack'),
           ]),
+          techsIds: z.array(z.cuid2()),
           githubUrl: z.httpUrl(),
           deployUrl: z.httpUrl().optional(),
         }),
@@ -38,10 +40,12 @@ export const createProjectRoute: FastifyPluginAsyncZod = async (app) => {
     },
     async (request, reply) => {
       const createProjectUseCase = new CreateProjectUseCase(
-        new DrizzleProjectsRepository()
+        new DrizzleProjectsRepository(),
+        new DrizzleTechsRepository()
       )
 
-      const { name, description, type, githubUrl, deployUrl } = request.body
+      const { name, description, type, githubUrl, deployUrl, techsIds } =
+        request.body
       const userId = request.getCurrentUserId()
 
       const { project } = await createProjectUseCase.execute({
@@ -51,6 +55,7 @@ export const createProjectRoute: FastifyPluginAsyncZod = async (app) => {
         githubUrl,
         deployUrl,
         userId,
+        techsIds,
       })
 
       return reply.status(201).send({

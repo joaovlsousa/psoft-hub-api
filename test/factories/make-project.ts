@@ -1,10 +1,7 @@
 import { UniqueEntityID } from '@core/entities/unique-entity-id.ts'
-import { Description } from '@domain/enterprise/entities/description.ts'
-import { Name } from '@domain/enterprise/entities/name.ts'
-import {
-  Project,
-  type ProjectProps,
-} from '@domain/enterprise/entities/project.ts'
+import { Description } from '@domain/entities/description.ts'
+import { Name } from '@domain/entities/name.ts'
+import { Project, type ProjectProps } from '@domain/entities/project.ts'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 
 export function makeProject(
