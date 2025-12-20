@@ -2,12 +2,17 @@ import type {
   GetUserDataResponse,
   OAuthService,
 } from '@domain/application/services/oauth-service.ts'
+import { faker } from '@faker-js/faker'
 
 export class TestOAuthService implements OAuthService {
-  async getUserData(_code: string): Promise<GetUserDataResponse> {
+  async getAccessToken(_code: string): Promise<string> {
+    return faker.string.uuid()
+  }
+
+  async getUserData(_accessToken: string): Promise<GetUserDataResponse> {
     return {
       name: 'user',
-      email: 'user@mail.com',
+      githubId: 1234,
       username: 'username',
       avatarUrl: 'http://github.com/username.png',
     }

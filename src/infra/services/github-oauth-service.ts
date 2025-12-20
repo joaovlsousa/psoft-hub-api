@@ -1,5 +1,5 @@
+import { GITHUB_API_URL, GITHUB_LOGIN_URL } from '@config/constants.ts'
 import { env } from '@config/env.ts'
-import { BadRequestError } from '@core/errors/bad-request-error.ts'
 import type {
   GetUserDataResponse,
   OAuthService,
@@ -7,10 +7,8 @@ import type {
 import { z } from 'zod'
 
 export class GithubOAuthService implements OAuthService {
-  async getUserData(code: string): Promise<GetUserDataResponse> {
-    const githubOAuthURL = new URL(
-      'https://github.com/login/oauth/access_token'
-    )
+  async getAccessToken(code: string): Promise<string> {
+    const githubOAuthURL = new URL(GITHUB_LOGIN_URL)
 
     githubOAuthURL.searchParams.set('client_id', env.GITHUB_OAUTH_CLIENT_ID)
     githubOAuthURL.searchParams.set(
@@ -41,65 +39,36 @@ export class GithubOAuthService implements OAuthService {
       })
       .parse(githubAccessTokenData)
 
-    const githubUserResponse = await fetch('https://api.github.com/user', {
+    return githubAccessToken
+  }
+
+  async getUserData(accessToken: string): Promise<GetUserDataResponse> {
+    const githubUserResponse = await fetch(`${GITHUB_API_URL}/user`, {
       headers: {
-        Authorization: `Bearer ${githubAccessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         Accept: 'application/json',
       },
     })
 
     const githubUserData = await githubUserResponse.json()
 
-    let {
+    const {
       name,
       avatar_url: avatarUrl,
-      email,
+      id: githubId,
       login: username,
     } = z
       .object({
         avatar_url: z.url(),
         name: z.string().nullable(),
-        email: z.email().nullable(),
+        id: z.number(),
         login: z.string(),
       })
       .parse(githubUserData)
 
-    if (!email) {
-      const githubUserEmailsResponse = await fetch(
-        'https://api.github.com/user/emails',
-        {
-          headers: {
-            Authorization: `Bearer ${githubAccessToken}`,
-            Accept: 'application/json',
-          },
-        }
-      )
-
-      const githubUserEmailsData = await githubUserEmailsResponse.json()
-
-      const githubUserEmails = z
-        .array(
-          z.object({
-            email: z.email(),
-            primary: z.boolean(),
-          })
-        )
-        .parse(githubUserEmailsData)
-
-      const githubUserEmail = githubUserEmails.find((emails) => emails.primary)
-
-      if (!githubUserEmail) {
-        throw new BadRequestError(
-          'Sua conta do GitHub deve ter um e-mail para autenticação.'
-        )
-      }
-
-      email = githubUserEmail.email
-    }
-
     return {
       name: name ?? 'User',
-      email,
+      githubId,
       username,
       avatarUrl,
     }

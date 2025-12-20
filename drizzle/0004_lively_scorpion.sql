@@ -1,0 +1,2 @@
+ALTER TABLE "project_tech" ADD CONSTRAINT "project_tech_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "project_tech" ADD CONSTRAINT "project_tech_tech_id_techs_id_fk" FOREIGN KEY ("tech_id") REFERENCES "public"."techs"("id") ON DELETE cascade ON UPDATE no action;

@@ -9,7 +9,8 @@ export class DrizzleUsersMapper {
     return {
       id: user.id.toString(),
       name: user.name,
-      email: user.email,
+      githubId: user.githubId,
+      githubHashedAccessToken: user.githubHashedAccessToken,
       username: user.username,
       avatarUrl: user.avatarUrl,
       createdAt: user.createdAt,
@@ -21,7 +22,8 @@ export class DrizzleUsersMapper {
     return User.create(
       {
         name: raw.name,
-        email: raw.email,
+        githubId: raw.githubId,
+        githubHashedAccessToken: raw.githubHashedAccessToken,
         username: raw.username,
         avatarUrl: raw.avatarUrl,
         createdAt: raw.createdAt,

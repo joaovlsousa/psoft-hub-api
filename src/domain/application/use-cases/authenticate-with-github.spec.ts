@@ -3,7 +3,7 @@ import { TestOAuthService } from '@test/services/test-oauth-service.ts'
 import { expect, it } from 'vitest'
 import { AuthenticateWithGithubUseCase } from './authenticate-with-github.ts'
 
-it('should be able to authenticate with github', async () => {
+it('', async () => {
   const inMemoryUsersRepository = new InMemoryUsersRepository()
   const testOAuthService = new TestOAuthService()
 
@@ -15,6 +15,8 @@ it('should be able to authenticate with github', async () => {
   const { token: token1 } = await authenticateWithGithubUseCase.execute({
     code: 'test-code',
   })
+
+  console.log('passou')
 
   const { token: token2 } = await authenticateWithGithubUseCase.execute({
     code: 'test-code',

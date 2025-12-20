@@ -1,3 +1,4 @@
+import { HashService } from '@core/services/hash-service.ts'
 import { JwtService } from '@core/services/jwt-service.ts'
 import { User } from '@domain/entities/user.ts'
 import type { UsersRespository } from '../repositories/users-repository.ts'
@@ -12,27 +13,35 @@ interface AuthenticateWithGithubUseCaseResponse {
 }
 
 export class AuthenticateWithGithubUseCase {
-  private readonly jwtService: JwtService
-
   constructor(
     private oAuthService: OAuthService,
     private usersRepository: UsersRespository
-  ) {
-    this.jwtService = new JwtService()
-  }
+  ) {}
 
   async execute({
     code,
   }: AuthenticateWithGithubUseCaseRequest): Promise<AuthenticateWithGithubUseCaseResponse> {
-    const { name, email, username, avatarUrl } =
-      await this.oAuthService.getUserData(code)
+    const githubAccessToken = await this.oAuthService.getAccessToken(code)
 
-    let user = await this.usersRepository.findByEmail(email)
+    const { name, githubId, username, avatarUrl } =
+      await this.oAuthService.getUserData(githubAccessToken)
+
+    const githubHashedAccessToken = await HashService.hash(githubAccessToken)
+
+    let user = await this.usersRepository.findByGithubId(githubId)
+
+    if (user) {
+      user.githubHashedAccessToken = githubHashedAccessToken
+      user.updatedAt = new Date()
+
+      await this.usersRepository.save(user)
+    }
 
     if (!user) {
       user = User.create({
         name,
-        email,
+        githubId,
+        githubHashedAccessToken,
         username,
         avatarUrl,
       })
@@ -40,7 +49,7 @@ export class AuthenticateWithGithubUseCase {
       await this.usersRepository.create(user)
     }
 
-    const token = this.jwtService.sign({ sub: user.id.toString() })
+    const token = JwtService.sign({ sub: user.id.toString() })
 
     return {
       token,

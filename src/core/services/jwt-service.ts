@@ -7,7 +7,7 @@ interface JwtPayload {
 }
 
 export class JwtService {
-  sign(payload: JwtPayload): string {
+  public static sign(payload: JwtPayload): string {
     const token = jwt.sign(payload, env.JWT_SECRET, {
       expiresIn: '7d',
     })
@@ -15,7 +15,7 @@ export class JwtService {
     return token
   }
 
-  verify(token: string): JwtPayload {
+  public static verify(token: string): JwtPayload {
     try {
       const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload
 

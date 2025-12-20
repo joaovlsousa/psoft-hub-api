@@ -9,7 +9,8 @@ export function makeUser(
   const user = User.create(
     {
       name: faker.person.fullName(),
-      email: faker.internet.email(),
+      githubId: faker.number.int(),
+      githubHashedAccessToken: faker.string.uuid(),
       username: faker.internet.username(),
       avatarUrl: faker.image.avatarGitHub(),
       ...override,

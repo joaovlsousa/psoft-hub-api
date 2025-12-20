@@ -8,6 +8,7 @@ const envSchema = z.object({
   HOST: z.string().default('0.0.0.0'),
   DATABASE_URL: z.url(),
   JWT_SECRET: z.string(),
+  HASH_SECRET: z.string(),
   GITHUB_OAUTH_CLIENT_ID: z.string(),
   GITHUB_OAUTH_CLIENT_SECRET: z.string(),
   GITHUB_OAUTH_CLIENT_REDIRECT_URI: z.url(),

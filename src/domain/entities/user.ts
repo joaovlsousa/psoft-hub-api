@@ -4,8 +4,9 @@ import type { Optional } from '@core/types/optional.ts'
 
 export interface UserProps {
   name: string
-  email: string
   username: string
+  githubId: number
+  githubHashedAccessToken: string
   avatarUrl: string
   createdAt: Date
   updatedAt?: Date | null
@@ -31,12 +32,16 @@ export class User extends Entity<UserProps> {
     return this.props.name
   }
 
-  public get email(): string {
-    return this.props.email
+  public get githubId(): number {
+    return this.props.githubId
   }
 
   public get username(): string {
     return this.props.username
+  }
+
+  public get githubHashedAccessToken(): string {
+    return this.props.githubHashedAccessToken
   }
 
   public get avatarUrl(): string {
@@ -49,5 +54,13 @@ export class User extends Entity<UserProps> {
 
   public get updatedAt(): Date | undefined | null {
     return this.props.updatedAt
+  }
+
+  public set githubHashedAccessToken(githubHashedAccessToken: string) {
+    this.props.githubHashedAccessToken = githubHashedAccessToken
+  }
+
+  public set updatedAt(updatedAt: Date) {
+    this.props.updatedAt = updatedAt
   }
 }

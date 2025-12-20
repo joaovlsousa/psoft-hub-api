@@ -16,9 +16,7 @@ export async function authMiddleware(request: FastifyRequest) {
       throw new UnauthorizedError()
     }
 
-    const jwtService = new JwtService()
-
-    const { sub } = jwtService.verify(code)
+    const { sub } = JwtService.verify(code)
 
     return sub
   }

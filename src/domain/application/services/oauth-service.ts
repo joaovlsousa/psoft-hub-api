@@ -1,10 +1,11 @@
 export interface GetUserDataResponse {
   name: string
-  email: string
+  githubId: number
   username: string
   avatarUrl: string
 }
 
 export interface OAuthService {
-  getUserData(code: string): Promise<GetUserDataResponse>
+  getAccessToken(code: string): Promise<string>
+  getUserData(accessToken: string): Promise<GetUserDataResponse>
 }

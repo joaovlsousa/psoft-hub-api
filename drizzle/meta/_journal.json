@@ -22,6 +22,20 @@
       "when": 1765636288506,
       "tag": "0002_aromatic_nebula",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766262738252,
+      "tag": "0003_cold_morgan_stark",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766263270804,
+      "tag": "0004_lively_scorpion",
+      "breakpoints": true
     }
   ]
 }

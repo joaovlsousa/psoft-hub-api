@@ -19,11 +19,17 @@ export class DrizzleUsersRepository implements UsersRespository {
     await this.db.insert(usersTable).values(raw)
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async save(user: User): Promise<void> {
+    const raw = DrizzleUsersMapper.toDrizzle(user)
+
+    await this.db.update(usersTable).set(raw).where(eq(usersTable.id, raw.id))
+  }
+
+  async findByGithubId(githubId: number): Promise<User | null> {
     const [raw] = await this.db
       .select()
       .from(usersTable)
-      .where(eq(usersTable.email, email))
+      .where(eq(usersTable.githubId, githubId))
 
     if (!raw) {
       return null

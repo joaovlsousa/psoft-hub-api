@@ -1,4 +1,5 @@
 import {
+  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -16,7 +17,8 @@ export const projectType = pgEnum('project_type', [
 export const usersTable = pgTable('users', {
   id: text().primaryKey(),
   name: text().notNull(),
-  email: text().notNull().unique(),
+  githubId: integer().notNull().unique(),
+  githubHashedAccessToken: text().notNull(),
   username: text().notNull().unique(),
   avatarUrl: text().notNull(),
   createdAt: timestamp().notNull(),
@@ -53,8 +55,16 @@ export const techsTable = pgTable('techs', {
 export const projectTechTable = pgTable(
   'project_tech',
   {
-    projectId: text().notNull(),
-    techId: text().notNull(),
+    projectId: text()
+      .notNull()
+      .references(() => projectsTable.id, {
+        onDelete: 'cascade',
+      }),
+    techId: text()
+      .notNull()
+      .references(() => techsTable.id, {
+        onDelete: 'cascade',
+      }),
   },
   (table) => [
     primaryKey({
