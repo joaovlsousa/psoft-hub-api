@@ -9,6 +9,7 @@ import { findAllTechsRoute } from '@infra/http/routes/find-all-techs.ts'
 import { findProjectByIdRoute } from '@infra/http/routes/find-project-by-id.ts'
 import { findProjectsByUserIdRoute } from '@infra/http/routes/find-projects-by-user-id.ts'
 import { getProfileRoute } from '@infra/http/routes/get-profile.ts'
+import { getUserRepositoriesRoute } from '@infra/http/routes/get-user-repositories.ts'
 import { updateProjectRoute } from '@infra/http/routes/update-project.ts'
 import { uploadProjectImageRoute } from '@infra/http/routes/upload-project-image.ts'
 import ScalarApiReference from '@scalar/fastify-api-reference'
@@ -58,6 +59,7 @@ server.register(getProfileRoute)
 server.register(uploadProjectImageRoute)
 server.register(deleteProjectRoute)
 server.register(findAllTechsRoute)
+server.register(getUserRepositoriesRoute)
 
 server
   .listen({

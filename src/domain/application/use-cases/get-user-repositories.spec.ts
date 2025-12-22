@@ -1,33 +1,40 @@
 import { UnauthorizedError } from '@core/errors/unauthorized-error.ts'
 import { makeUser } from '@test/factories/make-user.ts'
 import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.ts'
+import { TestOAuthService } from '@test/services/test-oauth-service.ts'
 import { describe, expect, it } from 'vitest'
-import { GetProfileUseCase } from './get-profile.ts'
+import { GetUserRepositories } from './get-user-repositories.ts'
 
-describe('get profile', () => {
-  it('should be able to get user profile', async () => {
+describe('get user repositories', () => {
+  it('should be able to get user repositories', async () => {
     const inMemoryUsersRepository = new InMemoryUsersRepository()
-    const getProfileUseCase = new GetProfileUseCase(inMemoryUsersRepository)
+    const getUserRepositories = new GetUserRepositories(
+      inMemoryUsersRepository,
+      new TestOAuthService()
+    )
 
     const domainUser = await makeUser()
 
     await inMemoryUsersRepository.create(domainUser)
 
-    const { user } = await getProfileUseCase.execute({
+    const { repositories } = await getUserRepositories.execute({
       userId: domainUser.id.toString(),
     })
 
-    expect(user).toBeTruthy()
+    expect(repositories).toHaveLength(5)
   })
 
-  it('should not be able to get user profile', async () => {
+  it('should not be able to get user repositories', async () => {
     const inMemoryUsersRepository = new InMemoryUsersRepository()
-    const getProfileUseCase = new GetProfileUseCase(inMemoryUsersRepository)
+    const getUserRepositories = new GetUserRepositories(
+      inMemoryUsersRepository,
+      new TestOAuthService()
+    )
 
     const domainUser = await makeUser()
 
     await expect(
-      getProfileUseCase.execute({
+      getUserRepositories.execute({
         userId: domainUser.id.toString(),
       })
     ).rejects.toThrow(UnauthorizedError)

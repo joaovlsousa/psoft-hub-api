@@ -1,7 +1,9 @@
 import { GITHUB_API_URL, GITHUB_LOGIN_URL } from '@config/constants.ts'
 import { env } from '@config/env.ts'
+import { BadGatewayError } from '@core/errors/bad-gateway-error.ts'
 import type {
   GetUserDataResponse,
+  GetUserRepositoriesResponse,
   OAuthService,
 } from '@domain/application/services/oauth-service.ts'
 import { z } from 'zod'
@@ -20,6 +22,7 @@ export class GithubOAuthService implements OAuthService {
       env.GITHUB_OAUTH_CLIENT_REDIRECT_URI
     )
     githubOAuthURL.searchParams.set('code', code)
+    githubOAuthURL.searchParams.set('scope', 'read:user read:public_repos')
 
     const githubAccessTokenResponse = await fetch(githubOAuthURL, {
       method: 'POST',
@@ -71,6 +74,38 @@ export class GithubOAuthService implements OAuthService {
       githubId,
       username,
       avatarUrl,
+    }
+  }
+
+  async getUserRepositories(
+    accessToken: string
+  ): Promise<GetUserRepositoriesResponse> {
+    const githubUserRepositoriesResponse = await fetch(
+      `${GITHUB_API_URL}/user/repos`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
+      }
+    )
+
+    if (!githubUserRepositoriesResponse.ok) {
+      throw new BadGatewayError()
+    }
+
+    const githubUserRepositories = await githubUserRepositoriesResponse.json()
+
+    const repositories = z
+      .array(
+        z.object({
+          name: z.string(),
+        })
+      )
+      .parse(githubUserRepositories)
+
+    return {
+      repositories: repositories.map((repository) => repository.name),
     }
   }
 }

@@ -12,7 +12,7 @@ Content-Type: application/json
 Origin: {{origin}}
 
 {
-  "code": "ca6225fc9a60ed2a9b77"
+  "code": "ac5df0fc6c00f1f60297"
 }
 
 ###
@@ -88,4 +88,11 @@ Origin: {{origin}}
 
 # @name findAllTechs
 GET {{baseUrl}}/techs
+Origin: {{origin}}
+
+###
+
+# @name getUserRepositories
+GET {{baseUrl}}/repositories
+Authorization: Bearer {{token}}
 Origin: {{origin}}
