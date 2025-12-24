@@ -9,8 +9,27 @@ export interface GetUserRepositoriesResponse {
   repositories: string[]
 }
 
+export interface GetRepositoryDataRequest {
+  accessToken: string
+  username: string
+  repository: string
+}
+
+export interface GetRepositoryDataResponse {
+  repository: {
+    name: string
+    description: string | null
+    homepageUrl: string | null
+    githubUrl: string
+    language: string
+  }
+}
+
 export interface OAuthService {
   getAccessToken(code: string): Promise<string>
   getUserData(accessToken: string): Promise<GetUserDataResponse>
   getUserRepositories(accessToken: string): Promise<GetUserRepositoriesResponse>
+  getRepositoryData(
+    params: GetRepositoryDataRequest
+  ): Promise<GetRepositoryDataResponse>
 }

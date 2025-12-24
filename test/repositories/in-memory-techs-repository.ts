@@ -20,6 +20,16 @@ export class InMemoryTechsRepository implements TechsRespository {
     return this.techs
   }
 
+  async findOneByName(name: string): Promise<Tech | null> {
+    const tech = this.techs.find((tech) => tech.name === name)
+
+    if (!tech) {
+      return null
+    }
+
+    return tech
+  }
+
   async delete(techId: string): Promise<void> {
     this.techs = this.techs.filter((tech) => tech.id.toString() !== techId)
   }

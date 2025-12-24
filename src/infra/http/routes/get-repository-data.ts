@@ -1,5 +1,6 @@
 import { httpErrorSchema } from '@core/schemas/http-error-schema.ts'
-import { GetUserRepositories } from '@domain/application/use-cases/get-user-repositories.ts'
+import { GetRepositoryData } from '@domain/application/use-cases/get-repository-data.ts'
+import { DrizzleTechsRepository } from '@infra/database/drizzle/repositories/drizzle-techs-respository.ts'
 import { DrizzleUsersRepository } from '@infra/database/drizzle/repositories/drizzle-users-respository.ts'
 import { GithubOAuthService } from '@infra/services/github-oauth-service.ts'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
@@ -7,21 +8,25 @@ import { z } from 'zod'
 import { authMiddleware } from '../middlewares/auth-middleware.ts'
 import { clientHostMiddleware } from '../middlewares/client-host-middleware.ts'
 
-export const getUserRepositoriesRoute: FastifyPluginAsyncZod = async (app) => {
+export const getRepositoryDataRoute: FastifyPluginAsyncZod = async (app) => {
   app.get(
-    '/repos',
+    '/repos/:slug',
     {
       schema: {
-        summary: 'Get user repositories',
+        summary: 'Get repository data',
         tags: ['Repositories'],
+        params: z.object({
+          slug: z.string(),
+        }),
         response: {
           200: z.object({
-            repositories: z.array(
-              z.object({
-                name: z.string(),
-                slug: z.string(),
-              })
-            ),
+            repository: z.object({
+              name: z.string(),
+              description: z.string().nullable(),
+              homepageUrl: z.httpUrl().nullable(),
+              githubUrl: z.httpUrl(),
+              techId: z.string().nullable(),
+            }),
           }),
           401: httpErrorSchema,
           500: httpErrorSchema,
@@ -32,16 +37,21 @@ export const getUserRepositoriesRoute: FastifyPluginAsyncZod = async (app) => {
     },
     async (request, reply) => {
       const userId = request.getCurrentUserId()
+      const { slug } = request.params
 
-      const getUserRepositories = new GetUserRepositories(
+      const getRepositoryData = new GetRepositoryData(
         new DrizzleUsersRepository(),
+        new DrizzleTechsRepository(),
         new GithubOAuthService()
       )
 
-      const { repositories } = await getUserRepositories.execute({ userId })
+      const { repository } = await getRepositoryData.execute({
+        userId,
+        repositorySlug: slug,
+      })
 
       return reply.status(200).send({
-        repositories,
+        repository,
       })
     }
   )

@@ -14,22 +14,35 @@ export class DrizzleTechsRepository implements TechsRespository {
   }
 
   async findAll(): Promise<Tech[]> {
-    const techs = await this.db
+    const raw = await this.db
       .select()
       .from(techsTable)
       .orderBy(asc(techsTable.name))
 
-    return techs.map(DrizzleTechsMapper.toDomain)
+    return raw.map(DrizzleTechsMapper.toDomain)
   }
 
   async findManyByIdList(techsIds: string[]): Promise<Tech[]> {
-    const techs = await this.db
+    const raw = await this.db
       .select()
       .from(techsTable)
       .where(inArray(techsTable.id, techsIds))
       .orderBy(asc(techsTable.name))
 
-    return techs.map(DrizzleTechsMapper.toDomain)
+    return raw.map(DrizzleTechsMapper.toDomain)
+  }
+
+  async findOneByName(name: string): Promise<Tech | null> {
+    const [raw] = await this.db
+      .select()
+      .from(techsTable)
+      .where(eq(techsTable.name, name))
+
+    if (!raw) {
+      return null
+    }
+
+    return DrizzleTechsMapper.toDomain(raw)
   }
 
   async create(tech: Tech): Promise<void> {

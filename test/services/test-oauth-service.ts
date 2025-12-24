@@ -1,4 +1,6 @@
 import type {
+  GetRepositoryDataRequest,
+  GetRepositoryDataResponse,
   GetUserDataResponse,
   GetUserRepositoriesResponse,
   OAuthService,
@@ -12,10 +14,10 @@ export class TestOAuthService implements OAuthService {
 
   async getUserData(_accessToken: string): Promise<GetUserDataResponse> {
     return {
-      name: 'user',
+      name: faker.person.fullName(),
       githubId: 1234,
-      username: 'username',
-      avatarUrl: 'http://github.com/username.png',
+      username: faker.internet.username(),
+      avatarUrl: faker.image.avatarGitHub(),
     }
   }
 
@@ -24,6 +26,20 @@ export class TestOAuthService implements OAuthService {
   ): Promise<GetUserRepositoriesResponse> {
     return {
       repositories: Array.from({ length: 5 }).map(() => faker.lorem.slug()),
+    }
+  }
+
+  async getRepositoryData(
+    _params: GetRepositoryDataRequest
+  ): Promise<GetRepositoryDataResponse> {
+    return {
+      repository: {
+        name: faker.lorem.slug(),
+        description: faker.lorem.words(),
+        homepageUrl: faker.internet.url(),
+        githubUrl: faker.internet.url(),
+        language: 'TypeScript',
+      },
     }
   }
 }

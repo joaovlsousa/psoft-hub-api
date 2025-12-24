@@ -12,7 +12,7 @@ Content-Type: application/json
 Origin: {{origin}}
 
 {
-  "code": "ac5df0fc6c00f1f60297"
+  "code": "e4ed5d62a0b8fd3ec70b"
 }
 
 ###
@@ -93,6 +93,13 @@ Origin: {{origin}}
 ###
 
 # @name getUserRepositories
-GET {{baseUrl}}/repositories
+GET {{baseUrl}}/repos
+Authorization: Bearer {{token}}
+Origin: {{origin}}
+
+###
+
+# @name getRepositoryData
+GET {{baseUrl}}/repos/portfolio
 Authorization: Bearer {{token}}
 Origin: {{origin}}
